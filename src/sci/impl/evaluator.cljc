@@ -199,9 +199,14 @@
                                                    :cljs (.-name instance-class))
                             instance-class-symbol (symbol instance-class-name)]
                         (get class->opts instance-class-symbol)))
-            ^Class target-class (if allowed? instance-class
-                                    (when-let [f (:public-class ctx)]
-                                      (f instance-expr*)))]
+            ^Class target-class (if #?(:clj
+                                       (or allowed?
+                                           (instance? sci.impl.types.IReified
+                                                      instance-expr*))
+                                       :cljs allowed?)
+                                  instance-class
+                                  (when-let [f (:public-class ctx)]
+                                    (f instance-expr*)))]
         ;; we have to check options at run time, since we don't know what the class
         ;; of instance-expr is at analysis time
         (when-not #?(:clj target-class
