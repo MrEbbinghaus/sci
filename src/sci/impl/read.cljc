@@ -16,10 +16,14 @@
   ([sci-ctx stream eof-error? eof-value]
    (read sci-ctx stream eof-error? eof-value false))
   ([sci-ctx stream _eof-error? eof-value _recursive?]
+   ;; converting to indexing-push-back-reader is necessary because edamame
+   ;; demands it, but we can alter edamame to accept it to not index
    (let [v (parser/parse-next sci-ctx (r/indexing-push-back-reader stream) {:eof eof-value})]
      (if (utils/kw-identical? parser/eof v)
        eof-value
        v)))
+  ;; converting to indexing-push-back-reader is necessary because edamame
+  ;; demands it, but we can alter edamame to accept it to not index
   ([sci-ctx _opts stream]
    (parser/parse-next sci-ctx (r/indexing-push-back-reader stream))))
 
